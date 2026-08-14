@@ -5,9 +5,9 @@ DATA: 13/08/2026
 DISCIPLINA: Linguagem de Programação II / Laboratório LP2
 
 DESCRIÇÃO DO PROGRAMA:
-  Aplicativo de estimativa educacional para a Academia ACME que calcula a quantidade
+  Aplicativo top para a Academia ACME que calcula a quantidade
   diária recomendada de água com base no peso corporal, nível de atividade física e 
-  condições climáticas do dia.
+  condições climáticas do dia 
 
 FÓRMULAS E REGRAS DE NEGÓCIO:
   1. Consumo Base: base_ml = peso * ML_POR_KG (35 ml por kg de peso corporal).
@@ -22,7 +22,7 @@ FÓRMULAS E REGRAS DE NEGÓCIO:
      meta_ml = peso * ML_POR_KG * fator_atividade * fator_clima
   5. Conversão e Copos:
      - meta_litros = meta_ml / ML_POR_LITRO (1000)
-     - copos = math.ceil(meta_ml / CAPACIDADE_COPO_ML) (arredondado para cima para garantir hidratação)
+     - copos = math.ceil(meta_ml / CAPACIDADE_COPO_ML) (arredondado para cima)
 ===============================================================================
 """
 
@@ -37,12 +37,12 @@ from gi.repository import Gtk
 PASTA = os.path.dirname(os.path.abspath(__file__))
 ARQUIVO = os.path.join(PASTA, "agua.glade")
 
-# --- CONSTANTES DE NEGÓCIO (Evita números mágicos no código) ---
+# --- CONSTANTES DE NEGÓCIO (Evita números estranhos no código) ---
 ML_POR_KG = 35.0
 ML_POR_LITRO = 1000.0
 CAPACIDADE_COPO_ML = 200.0
 
-# Fatores de atividade física baseados no índice do ComboBox
+# Fatores de atividade física
 FATORES_ATIVIDADE = {
     0: 1.00,  # Leve
     1: 1.15,  # Moderado
@@ -55,14 +55,14 @@ FATOR_CLIMA_QUENTE = 1.10
 
 
 class Aplicacao:
-    """Classe principal da aplicação GTK que gerencia a interface gráfica e a ligação dos eventos."""
+    """Classe principal que gerencia a interface gráfica e eventos."""
 
     def __init__(self):
-        """Inicializa o Gtk.Builder, carrega o Glade, obtém as referências dos widgets e conecta os sinais."""
+        """Inicializa o Gtk.Builder, carrega o Glade, obtém as referências e conecta os sinais."""
         self.builder = Gtk.Builder()
         self.builder.add_from_file(ARQUIVO)
 
-        # Mapeamento e conexão automática dos handlers (ao_destruir, ao_calcular, ao_limpar)
+        # Mapea e conecta automático(ao_destruir, ao_calcular, ao_limpar)
         self.builder.connect_signals(self)
 
         # Referências salvas em atributos de instância (Apenas os componentes acessados/alterados pelo Python)
@@ -76,7 +76,7 @@ class Aplicacao:
         self.jan_principal.show_all()
 
     def fator_da_atividade(self) -> float:
-        """Obtém o fator multiplicativo correspondente à opção selecionada no ComboBox.
+        """Obtém o fator multiplicativo correspondente à opção selecionada
 
         Returns:
             float: Fator de atividade (1.00, 1.15 ou 1.30).
@@ -85,7 +85,7 @@ class Aplicacao:
         return FATORES_ATIVIDADE.get(indice, 1.00)
 
     def calcular_meta(self, peso: float, fator_atividade: float, clima_quente: bool) -> float:
-        """Regra de negócio pura: Calcula a meta total diária de água em mililitros.
+        """ Calcula a meta total diária de água em mililitros.
 
         Args:
             peso (float): Peso da pessoa em quilogramas.
@@ -100,7 +100,7 @@ class Aplicacao:
         return meta_ml
 
     def contar_copos(self, meta_ml: float) -> int:
-        """Regra de negócio pura: Calcula a quantidade aproximada de copos de 200 ml.
+        """Calcula a quantidade aproximada de copos de 200 ml.
 
         Args:
             meta_ml (float): Meta diária em mililitros.
@@ -115,7 +115,7 @@ class Aplicacao:
     def ao_calcular(self, widget):
         """Handler executado ao clicar no botão 'Calcular'.
 
-        Lê os dados da GUI, chama os métodos de cálculo e exibe o resultado formatado no label.
+        Lê os dados da GUI, chama os métodos de cálculo e exibe o resultado
         """
         peso = self.spn_peso.get_value()
         fator_atividade = self.fator_da_atividade()
@@ -126,7 +126,7 @@ class Aplicacao:
         meta_litros = meta_ml / ML_POR_LITRO
         copos = self.contar_copos(meta_ml)
 
-        # Atualização do label com marcações Pango Markup em negrito e tamanho ajustado
+        # Atualização do label com marcações e arrumado bonitinho
         texto_resultado = (
             f"<big><b>{meta_litros:.2f} L por dia</b></big>\n"
             f"<small>Cerca de {copos} copos de 200 ml</small>"
@@ -144,7 +144,7 @@ class Aplicacao:
         self.lbl_resultado.set_label("")
 
     def ao_destruir(self, widget):
-        """Handler do evento destroy da janela principal. Finaliza o loop do GTK."""
+        """Handler do evento destroy da janela principal."""
         Gtk.main_quit()
 
 
